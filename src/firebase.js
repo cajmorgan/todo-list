@@ -17,9 +17,9 @@ function executeFireBase() {
     };
 
     firebase.initializeApp(firebaseConfig);
-    const bigOne = document.querySelector('#bigOne');
-    const dbRef = firebase.database().ref().child('text');
-    dbRef.on('value', snap => bigOne.innerText = snap.val());
+    // const bigOne = document.querySelector('#bigOne');
+    // const dbRef = firebase.database().ref().child('text');
+    // dbRef.on('value', snap => bigOne.innerText = snap.val());
 }
 
 function fireBaseAuth() {

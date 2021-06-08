@@ -9,10 +9,13 @@ createLoginForm();
 getCredentialsAndLogin();
 
 //If logged in 
+import { createUI, getProjects, loadProjects, Projects } from "./app/application";
 firebase.auth().onAuthStateChanged(user => {
     if(user) {
-        console.log('is working huh?');
+        createUI();
+        getProjects();
+    }
+    else {
+        document.querySelector('.container').style.display = "none";
     }
 })
-
-console.log('hello')
