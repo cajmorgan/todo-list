@@ -107,6 +107,7 @@ function getCredentialsAndLogin() {
                 name: '',
                 projectsNum: 0,
                 projectsArr: [],
+                numberOfTasks: 0
             })
         })
         //Set name in object
@@ -126,7 +127,7 @@ function getCredentialsAndLogin() {
         })
         //Create default object
         promise.then(value => {
-            const defaultProject = new Projects('default', 1, []);
+            const defaultProject = new Projects('default', 1, [], 0);
             db.collection('userData').doc(value.user.uid).update({
                 projectsArr: firebase.firestore.FieldValue.arrayUnion(JSON.stringify(defaultProject)),
                 projectsNum: firebase.firestore.FieldValue.increment(1),
