@@ -134,6 +134,11 @@ function getCredentialsAndLogin() {
             })
 
         })
+        // promise.then(e => {
+        //     setInterval(() => {
+        //         location.reload();
+        //     }, 1000)
+        // })
         promise.catch(e => { 
         if(e.message.match(/Password should be/g)) {
             if(document.querySelector('#warningTxt')) {

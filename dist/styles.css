@@ -9,9 +9,12 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex-direction: column;
   align-items: center;
   background-color: white;
   font-family: "Barlow Condensed", sans-serif;
+  overflow: scroll;
+  transition-duration: 1s;
 }
 
 /* Login Form */
@@ -125,7 +128,13 @@ body {
   display: flex;
   height: 150px;
   margin: 0;
-  background-color: rgb(218, 218, 218);
+  /* background-color: rgb(218, 218, 218); */
+  background: linear-gradient(
+    180deg,
+    rgb(179, 179, 179) 0%,
+    rgb(145, 145, 145) 100%
+  );
+  color: rgb(16, 16, 16);
 }
 
 .headerRight {
@@ -167,7 +176,11 @@ body {
 main {
   display: flex;
   flex-direction: row;
-  background-color: gray;
+  background: linear-gradient(
+    180deg,
+    rgba(56, 56, 56, 1) 0%,
+    rgba(38, 38, 38, 1) 100%
+  );
 }
 
 main h2 {
@@ -178,6 +191,9 @@ section {
   display: flex;
   flex-direction: column;
   width: 550px;
+  height: 1050px;
+  overflow: scroll;
+  color: rgb(225, 225, 225);
 }
 
 .newTaskBtn {
@@ -219,6 +235,28 @@ section {
   margin: 10px;
 }
 
+/* Tasks */
+
+.tasks {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-shadow: 1px 1px 2px 1px #00000046;
+  width: 550px;
+  cursor: cell;
+}
+
+.tasks h3 {
+  margin: 20px;
+  width: 90px;
+}
+
+.tasks h4 {
+  position: relative;
+  left: 0px;
+  width: 50px;
+}
+
 /* Sidebar */
 
 aside {
@@ -226,7 +264,13 @@ aside {
   flex-direction: column;
   height: 1050px;
   width: 250px;
-  background-color: rgb(196, 195, 195);
+  /* background-color: rgb(196, 195, 195); */
+  background: linear-gradient(
+    180deg,
+    rgb(116, 116, 116) 0%,
+    rgb(65, 65, 65) 100%
+  );
+  color: rgb(36, 36, 36);
   overflow: scroll;
 }
 
@@ -301,4 +345,17 @@ aside h2 {
 
 .newProjectPopUp input {
   margin: 0;
+}
+
+/* media query */
+@media screen and (max-height: 1120px) {
+  body {
+    transform: scale(0.7);
+  }
+}
+
+@media screen and (max-height: 780px) {
+  body {
+    transform: scale(0.5);
+  }
 }

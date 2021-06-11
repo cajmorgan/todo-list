@@ -5,6 +5,10 @@ let globalProjectArr = [];
 let globalTaskArr = [];
 let globalProjectIdSelection = 1;
 
+function loader(ms) {
+    //create a loader when needed. 
+}
+
 const container = document.querySelector('.container')
 function createUI() {
     container.style.display = "flex";
@@ -54,11 +58,12 @@ function createUI() {
 }
 
 class Projects {
-    constructor(name, projectID, tasks, numberOfTasks) {
+    constructor(name, projectID, tasks, numberOfTasks, taskIDCounter) {
         this.name = name;
         this.projectID = projectID;
         this.tasks = tasks;
         this.numberOfTasks = numberOfTasks;
+        this.taskIDCounter = taskIDCounter
     }
 }
 
@@ -111,6 +116,8 @@ function getProjects(){
     globalProjectArr = [];
     const db = firebase.firestore();
     const user = firebase.auth().currentUser;
+    //Create load icon
+    setTimeout(() => {
     db.collection('userData').doc(user.uid).get().then((doc) => {
         for(let i = 0; i < doc.data().projectsArr.length; i++) {
             globalProjectArr.push(JSON.parse(doc.data().projectsArr[i]));
@@ -119,6 +126,7 @@ function getProjects(){
         getTasks();
         createProjectsFromLoad();
     })
+    },1000)
 }
 
 function createProjectsFromLoad() {
@@ -132,7 +140,7 @@ function createProjectsFromLoad() {
     for(let i = 0; i < globalProjectArr.length; i++) {
         const projectDiv = document.createElement('div');
         projectDiv.classList.add('projects');
-        projectDiv.setAttribute('id', `${globalProjectArr[i].projectID}`)
+        projectDiv.setAttribute('id', `project${globalProjectArr[i].projectID}`)
         projectDiv.innerHTML = `<h3>Name: ${globalProjectArr[i].name}</h3><h4>Tasks: ${globalProjectArr[i].tasks.length}</h4><i id="delete${globalProjectArr[i].projectID}" class="fas fa-times"></i></i>`
         sideBar.appendChild(projectDiv);
     }
@@ -193,12 +201,6 @@ class Tasks {
         this.description = description,
         this.dueDate = dueDate,
         this.taskID = taskID
-    }
-    convertToDaysLeft() {
-        const currentDate = Date.now();
-        const dueDateMs = new Date(this.dueDate).getTime();
-        const daysLeft = Math.ceil(((dueDateMs - currentDate) / 86400000)) ;
-        return daysLeft;
     }
 }
 
@@ -263,11 +265,10 @@ function createNewTask() {
                 var indexOfArr = i;
                 var arr = globalProjectArr[i];
                 arr.numberOfTasks += 1;
-                
             }
         }
         const task = new Tasks(taskName, '', taskDate, arr.numberOfTasks);
-        task.daysLeft = task.convertToDaysLeft(); //Gör denna bara visuellt ist och spara endast datum i databasen för att slippa uppdatera
+        // task.daysLeft = task.convertToDaysLeft(); //Gör denna bara visuellt ist och spara endast datum i databasen för att slippa uppdatera
         arr.tasks.push(task);
         globalProjectArr.splice(indexOfArr, 1, arr); //Take index replace with new arr
         //Set db array with GlobalProjectArr! 
@@ -276,7 +277,11 @@ function createNewTask() {
                 projectsArr: firebase.firestore.FieldValue.arrayUnion(JSON.stringify(globalProjectArr[i]))
             })
         }
+        // Plus one on tasks project sidebar
+        getProjects()
+        getTasks()
     }
+    
 }
 
 function getTasks() {
@@ -287,11 +292,40 @@ function getTasks() {
             var arr = globalProjectArr[i];
         }
     }
-    for(let i = 0; i < arr.tasks.length; i++) {
-    
-        globalTaskArr.push(arr.tasks[i]);
+    globalTaskArr = [];
+    if(arr) {
+        for(let i = 0; i < arr.tasks.length; i++) {
+            globalTaskArr.push(arr.tasks[i]);
+        }
     }
+    
+    createTasksFromLoad();
+}
+
+function createTasksFromLoad() {
+    const section = document.querySelector('section');
+    if(document.querySelector('.tasks')) {
+        const tasks = document.querySelectorAll('.tasks');
+        for(let i = 0; i < tasks.length; i++) {
+            section.removeChild(tasks[i]);
+        }
+     }
+    for(let i = 0; i < globalTaskArr.length; i++) {
+        const taskDiv = document.createElement('div');
+        taskDiv.classList.add('tasks');
+        taskDiv.setAttribute('id', `task${globalTaskArr[i].taskID}`);
+        taskDiv.innerHTML = `<h3>Name: ${globalTaskArr[i].name}</h3><h3>Days left: ${convertToDaysLeft(globalTaskArr[i].dueDate)}</h3>`
+        section.appendChild(taskDiv);
+    }
+    newTaskButton()
     console.log(globalTaskArr);
+}
+
+function convertToDaysLeft(dueDate) {
+    const currentDate = Date.now();
+    const dueDateMs = new Date(dueDate).getTime();
+    const daysLeft = Math.ceil(((dueDateMs - currentDate) / 86400000)) ;
+    return daysLeft;
 }
 
 export { createUI, Projects, getProjects, globalProjectArr, globalTaskArr };
