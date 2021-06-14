@@ -201,6 +201,7 @@ section {
   flex: row;
   align-items: center;
   cursor: pointer;
+  animation: fade 1s;
 }
 
 .newTaskBtn i {
@@ -244,6 +245,7 @@ section {
   box-shadow: 1px 1px 2px 1px #00000046;
   width: 550px;
   cursor: cell;
+  animation: fade 1s;
 }
 
 .tasks h3 {
@@ -255,6 +257,15 @@ section {
   position: relative;
   left: 0px;
   width: 50px;
+}
+
+.tasks i {
+  font-size: 35px;
+  transition-duration: 1s;
+}
+
+.tasks i:hover {
+  color: lime;
 }
 
 /* Sidebar */
@@ -285,17 +296,29 @@ aside h2 {
   box-shadow: 1px 1px 2px 1px #00000046;
   width: 249px;
   cursor: cell;
+  animation: fade 1s;
+  transition-duration: 0.5s;
+}
+
+.projects:hover {
+  background: linear-gradient(
+    180deg,
+    rgb(175, 175, 175) 0%,
+    rgb(131, 131, 131) 100%
+  );
 }
 
 .projects h3 {
   margin: 20px;
   width: 90px;
+  pointer-events: none;
 }
 
 .projects h4 {
   position: relative;
   left: 0px;
   width: 50px;
+  pointer-events: none;
 }
 
 .projects i {
@@ -304,6 +327,11 @@ aside h2 {
   float: right;
   font-size: 25px;
   cursor: pointer;
+  transition-duration: 1s;
+}
+
+.projects i:hover {
+  color: rgb(250, 39, 39);
 }
 
 /* Project Btn */
@@ -313,6 +341,7 @@ aside h2 {
   flex: row;
   align-items: center;
   cursor: pointer;
+  animation: fade 1s;
 }
 
 .newProjectBtn i {
