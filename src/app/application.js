@@ -145,7 +145,10 @@ function createProjectsFromLoad() {
         sideBar.appendChild(projectDiv);
     }
     newProjectButton();
+    sideBar.addEventListener('click', selectProject)
     sideBar.addEventListener('click', deleteProject)
+    selectProjectColor();
+    
 
     //Start New Task loadlink
     newTaskButton();
@@ -164,13 +167,39 @@ function newProjectButton() {
     clickProjectButton()
  };
 
- function clickProjectButton() {
+function clickProjectButton() {
     const newProjectBtn = document.querySelector('.newProjectBtn');
     newProjectBtn.addEventListener('click', createNewProject)
 
- }
+}
 
- function deleteProject(e) {
+function selectProject(e) {
+    const availableIDs = globalProjectArr.map((item) => item.projectID)
+    for(let i = 0; i < availableIDs.length; i++) {
+        if(e.target.id == `project${availableIDs[i]}`) {
+            globalProjectIdSelection = availableIDs[i];
+            getTasks();
+            selectProjectColor();
+        }
+    }
+}
+function selectProjectColor() {
+    const availableIDs = globalProjectArr.map((item) => item.projectID)
+    for(let i = 0; i < availableIDs.length; i++) {
+        let project = document.querySelector(`#project${availableIDs[i]}`)
+        project.style.background = ''
+        if(availableIDs[i] === globalProjectIdSelection) {
+            project.style.background = `linear-gradient(
+                180deg,
+                rgb(175, 175, 175) 0%,
+                rgb(131, 131, 131) 100%
+              )`
+        }
+        
+    }
+}
+
+function deleteProject(e) {
     //Get Firestore
     const db = firebase.firestore();
     const user = firebase.auth().currentUser;
@@ -192,7 +221,7 @@ function newProjectButton() {
             }
         }
     
- }
+}
 
 //Tasks below
 class Tasks {
@@ -253,7 +282,6 @@ function createNewTask() {
         //Then, remove popUp
         const section = document.querySelector('section');
         section.removeChild(document.querySelector('.newTaskPopUp'))
-        //New plan: get globalProjectArr, update it with what's needed and replace the full array with that One.
         //Remova all from db for update
         for(let i = 0; i < globalProjectArr.length; i++) {
             db.collection('userData').doc(user.uid).update({
@@ -268,7 +296,6 @@ function createNewTask() {
             }
         }
         const task = new Tasks(taskName, '', taskDate, arr.numberOfTasks);
-        // task.daysLeft = task.convertToDaysLeft(); //Gör denna bara visuellt ist och spara endast datum i databasen för att slippa uppdatera
         arr.tasks.push(task);
         globalProjectArr.splice(indexOfArr, 1, arr); //Take index replace with new arr
         //Set db array with GlobalProjectArr! 
@@ -314,11 +341,56 @@ function createTasksFromLoad() {
         const taskDiv = document.createElement('div');
         taskDiv.classList.add('tasks');
         taskDiv.setAttribute('id', `task${globalTaskArr[i].taskID}`);
-        taskDiv.innerHTML = `<h3>Name: ${globalTaskArr[i].name}</h3><h3>Days left: ${convertToDaysLeft(globalTaskArr[i].dueDate)}</h3>`
+        taskDiv.innerHTML = `<i id="deleteTask${globalTaskArr[i].taskID}"class="fas fa-check"></i><h3>Name: ${globalTaskArr[i].name}</h3><h3>Days left: ${convertToDaysLeft(globalTaskArr[i].dueDate)}</h3>`
         section.appendChild(taskDiv);
     }
     newTaskButton()
-    console.log(globalTaskArr);
+    console.log(globalTaskArr)
+    console.log(globalProjectArr)
+    section.addEventListener('click', deleteTask)
+}
+
+
+function deleteTask(e) {
+    //Get Firestore
+    const db = firebase.firestore();
+    const user = firebase.auth().currentUser;
+    let availableTaskIDs = globalTaskArr.map((item) => item.taskID)
+    for(var i = 0; i < availableTaskIDs.length; i++) {
+        if(e.target.id == `deleteTask${availableTaskIDs[i]}`) {
+            console.log(`task${availableTaskIDs[i]}`)
+            //Remova all from db for update later
+            for(let j = 0; j < globalProjectArr.length; j++) {
+                    db.collection('userData').doc(user.uid).update({
+                        projectsArr: firebase.firestore.FieldValue.arrayRemove(JSON.stringify(globalProjectArr[j]))
+                    })
+                }
+                //Get current arr from globalProjectArr
+            for(let n = 0; n < globalProjectArr.length; n++) {
+                if(globalProjectArr[n].projectID === globalProjectIdSelection) {
+                    var indexOfArr = n;
+                    var currentProject = globalProjectArr[n];
+                }
+            }
+            //Edit currentProject and delete the selected task.
+            for(let j = 0; j < currentProject.tasks.length; j++) {
+                if(currentProject.tasks[j].taskID == availableTaskIDs[i]) {
+                    currentProject.tasks.splice(j, 1)
+                    console.log(currentProject.tasks)
+                    console.log(globalProjectArr)
+                }     
+            }
+            //Set db array with GlobalProjectArr! 
+            for(let k = 0; k < globalProjectArr.length; k++) {
+                db.collection('userData').doc(user.uid).update({
+                    projectsArr: firebase.firestore.FieldValue.arrayUnion(JSON.stringify(globalProjectArr[k]))
+                })
+            }
+            getProjects()
+            getTasks()
+
+        }
+    }
 }
 
 function convertToDaysLeft(dueDate) {
