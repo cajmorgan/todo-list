@@ -67,7 +67,7 @@ function getCredentialsAndLogin() {
                 if(document.querySelector('#warningTxt')) {
                     container.removeChild(document.querySelector('#warningTxt'))
                 }
-                console.log('no user found');
+                console.log('no user founds');
                 const warningTxt = document.createElement('span');
                 warningTxt.setAttribute('id', 'warningTxt');
                 warningTxt.innerHTML = "<p style='color: red;'>User doesn't exist!</p>"
@@ -110,7 +110,7 @@ function getCredentialsAndLogin() {
         })
         //Set name in object
         promise.then(value => {
-                let index = value.user.email.split('').findIndex((e, index) => e === '.' || e === '@' || e === '_');
+                let index = value.user.email.split('').findIndex((e, index) => e === '.' ||e === '@' ||e === '_');
                 let name = value.user.email.substr(0, index).split('').map((e, index) => {
                     if(index === 0) {
                         return e.toUpperCase()
