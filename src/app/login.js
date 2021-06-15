@@ -59,7 +59,6 @@ function getCredentialsAndLogin() {
         //Get credentials
         const email = inputEmail.value; 
         const pass = inputPassword.value;
-        console.log('fire!');
         const auth = firebase.auth();
         //Sign in
         const promise = auth.signInWithEmailAndPassword(email, pass)
@@ -92,7 +91,7 @@ function getCredentialsAndLogin() {
                 container.appendChild(warningTxt);
                 console.log('bad email/password')
             } 
-            console.log(e.message) })
+         })
     })
     //Sign Up event
     signUpButton.addEventListener('click', (e) => {
@@ -102,7 +101,6 @@ function getCredentialsAndLogin() {
         const auth = firebase.auth();
         const promise = auth.createUserWithEmailAndPassword(email, pass)
         promise.then(value => {
-            console.log('signIT!')
             return db.collection('userData').doc(value.user.uid).set({
                 name: '',
                 projectsNum: 0,
@@ -148,7 +146,6 @@ function getCredentialsAndLogin() {
             warningTxt.setAttribute('id', 'warningTxt');
             warningTxt.innerHTML = "<p style='color: red;'>A longer password please!</p>"
             container.appendChild(warningTxt);
-            console.log('password should be...')
             } else {
             if(document.querySelector('#warningTxt')) {
                 container.removeChild(document.querySelector('#warningTxt'))
@@ -157,7 +154,6 @@ function getCredentialsAndLogin() {
             warningTxt.setAttribute('id', 'warningTxt');
             warningTxt.innerHTML = "<p style='color: red;'>User already exists!</p>"
             container.appendChild(warningTxt);
-            console.log(e.message);
         }
         })
     })
@@ -184,7 +180,6 @@ function getCredentialsAndLogin() {
                 container.appendChild(infoTxt);
             })
             
-            console.log(user)
         } else {
             document.querySelector('.login').style.display = "flex";
             inputEmail.value = "";

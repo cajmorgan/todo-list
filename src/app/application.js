@@ -27,6 +27,7 @@ function createUI() {
                 //Log out button
                 const logOutBtnHeader = document.querySelector('#logOutBtnHeader');
                 logOutBtnHeader.addEventListener('click', (e) => {
+                globalProjectIdSelection = 1
                 firebase.auth().signOut();
             })
         })  
@@ -102,7 +103,6 @@ function createNewProject(name, id) {
                 projectsNum: firebase.firestore.FieldValue.increment(1),
             })
             db.collection('userData').doc(user.uid).get().then((doc) => { 
-                console.log(doc.data());
                 getProjects()
                 })
         })
@@ -116,12 +116,20 @@ function getProjects(){
     globalProjectArr = [];
     const db = firebase.firestore();
     const user = firebase.auth().currentUser;
-    //Create load icon
+    //Create loader icon
+    const container = document.querySelector('.container');
+    const loader = document.querySelector('.lds-ellipsis');
+    container.style.cursor = "wait";
+    container.style.filter = "blur(10px)";
+    loader.style.opacity = "1";
     setTimeout(() => {
+        container.style.cursor = "default";
+            container.style.filter = "blur(0px)";
+            loader.style.opacity = "0";
     db.collection('userData').doc(user.uid).get().then((doc) => {
         for(let i = 0; i < doc.data().projectsArr.length; i++) {
             globalProjectArr.push(JSON.parse(doc.data().projectsArr[i]));
-            // console.log(globalProjectArr);
+            
         }
         getTasks();
         createProjectsFromLoad();
@@ -200,6 +208,9 @@ function selectProjectColor() {
 }
 
 function deleteProject(e) {
+    if(e.target.id == 'delete1') {
+        alert('Default project cannot be deleted!');
+    } else {
     //Get Firestore
     const db = firebase.firestore();
     const user = firebase.auth().currentUser;
@@ -207,19 +218,19 @@ function deleteProject(e) {
     const availableIDs = globalProjectArr.map((item) => item.projectID)
         for(let i = 0; i < availableIDs.length; i++) {
             if(e.target.id == `delete${availableIDs[i]}`) {
-                // console.log(availableIDs[i])
                 const index = availableIDs.indexOf(availableIDs[i])
                 db.collection('userData').doc(user.uid).update({
                     projectsArr: firebase.firestore.FieldValue.arrayRemove(JSON.stringify(globalProjectArr[index]))
                 })
                 db.collection('userData').doc(user.uid).get().then((doc) => { 
-                    console.log(doc.data());
+                    globalProjectIdSelection = 1
                     getProjects()
                     })
                 
              
             }
         }
+    }    
     
 }
 
@@ -234,7 +245,6 @@ class Tasks {
 }
 
 function newTaskButton() {
-    console.log('new Task Button')
     const section = document.querySelector('section');
     if(document.querySelector('.newTaskBtn')) {
         section.removeChild(document.querySelector('.newTaskBtn'))
@@ -257,6 +267,18 @@ function clickTaskButton() {
 function createNewTask() {
     //Pop-up Task Name
     (function createNewTaskPopUp() {
+        const currentDate = () => {
+            const date = new Date();
+            const year = date.getFullYear();
+            let month = date.getMonth() + 1;
+            if(month == 13) {
+                month = 1 
+            }
+            let day = date.getDate();
+            if(String(day).length == 1) day = '0' + day;
+            if(String(month).length == 1) month = '0' + month;
+            return year + '-' + month + '-' + day;
+        }
         const section = document.querySelector('section');
         if(document.querySelector('.newTaskPopUp')) {
             section.removeChild(document.querySelector('.newTaskPopUp'))
@@ -264,7 +286,7 @@ function createNewTask() {
         const newTaskPopUp = document.createElement('div');
         newTaskPopUp.classList.add('newTaskPopUp');
         newTaskPopUp.innerHTML = `<h3>Name: </h3><input class="newTaskName" type="text" placeholder="Task Name"></input>
-        <h3>Date: </h3><input class="newTaskDate" type="date">
+        <h3>Date: </h3><input class="newTaskDate" type="date" value="${currentDate()}">
         <i id="saveTaskBtn" class="fas fa-save"></i>`
         section.insertBefore(newTaskPopUp, document.querySelector('.newTaskBtn'));
         //Add event listener to Save Project button
@@ -345,8 +367,6 @@ function createTasksFromLoad() {
         section.appendChild(taskDiv);
     }
     newTaskButton()
-    console.log(globalTaskArr)
-    console.log(globalProjectArr)
     section.addEventListener('click', deleteTask)
 }
 
@@ -358,7 +378,6 @@ function deleteTask(e) {
     let availableTaskIDs = globalTaskArr.map((item) => item.taskID)
     for(var i = 0; i < availableTaskIDs.length; i++) {
         if(e.target.id == `deleteTask${availableTaskIDs[i]}`) {
-            console.log(`task${availableTaskIDs[i]}`)
             //Remova all from db for update later
             for(let j = 0; j < globalProjectArr.length; j++) {
                     db.collection('userData').doc(user.uid).update({
@@ -376,8 +395,6 @@ function deleteTask(e) {
             for(let j = 0; j < currentProject.tasks.length; j++) {
                 if(currentProject.tasks[j].taskID == availableTaskIDs[i]) {
                     currentProject.tasks.splice(j, 1)
-                    console.log(currentProject.tasks)
-                    console.log(globalProjectArr)
                 }     
             }
             //Set db array with GlobalProjectArr! 
